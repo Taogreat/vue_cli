@@ -226,69 +226,69 @@
 
 
 ## 10.区分使用开发环境和生产环境
-  使用生产环境：
-    npm run build ==> webpack
-    1).在内存中进行编译打包，生成内存中的打包文件
-    2).保存到本地(在本地生成打包文件)   ===> 此时不能通过浏览器来访问，需要启动服务器运行
-  使用开发环境：
-    npm run dev ==> webpack-dev-server
-    1).在内存中进行编译打包，生成内存中的打包文件
-    2).使用服务器，运行内存中的打包文件   ===> 可以通过浏览器来访问虚拟路径
+    使用生产环境：
+      npm run build ==> webpack
+      1).在内存中进行编译打包，生成内存中的打包文件
+      2).保存到本地(在本地生成打包文件)   ===> 此时不能通过浏览器来访问，需要启动服务器运行
+    使用开发环境：
+      npm run dev ==> webpack-dev-server
+      1).在内存中进行编译打包，生成内存中的打包文件
+      2).使用服务器，运行内存中的打包文件   ===> 可以通过浏览器来访问虚拟路径
 
 
 
 ## 11.vue样式不显示问题
-  网上找到的解释及解决方案
-  环境
-    vue-cli 4.4.6
-    css-loader 4.2.1
-    vue-style-loader 4.1.2
-  原因
-    vue-cli 4.4.6
-      vue-cli 4.4.6默认对css-loader配置为空
+    网上找到的解释及解决方案
+    环境
+      vue-cli 4.4.6
+      css-loader 4.2.1
+      vue-style-loader 4.1.2
+    原因
+      vue-cli 4.4.6
+        vue-cli 4.4.6默认对css-loader配置为空
 
-    css-loader 4.2.1
-      css-loader4.0后默认对esModule设置的是true
+      css-loader 4.2.1
+        css-loader4.0后默认对esModule设置的是true
 
-    vue-style-loader 4.1.2
-      vue-style-loader 4.1.2默认接收的是commonjs的结果，也就是默认接收的是“css-loader中esModule设置的是false的结果”，
-      所以一个配置的是true，一个接收的是false，最终就不会显示样式了。
-  方案
-    1).在项目的vue.config.js中对css的esModule改成false
-        module.exports = {
-          ...
-          css: {
+      vue-style-loader 4.1.2
+        vue-style-loader 4.1.2默认接收的是commonjs的结果，也就是默认接收的是“css-loader中esModule设置的是false的结果”，
+        所以一个配置的是true，一个接收的是false，最终就不会显示样式了。
+    方案
+      1).在项目的vue.config.js中对css的esModule改成false
+          module.exports = {
             ...
-              esModule: false
+            css: {
+              ...
+                esModule: false
+            }
+            ...
           }
-          ...
-        }
-    2).修改vue-style-loader的源码
-        vue-style-loader/index.js:
-        var shared = [
-          '// style-loader: Adds some css to the DOM by adding a <style> tag',
-          '',
-          '// load the styles',
-          'var content = require(' + request + ').default;', //这里加一个.default即可
-          ...
-    3).修改css-loader源码，让esModule默认为false
-        css-loader/dist/utils.js
-        function normalizeOptions(rawOptions, loaderContext) {
-          if (rawOptions.icss) {
-            loaderContext.emitWarning(new Error('The "icss" option is deprecated, use "modules.compileType: "icss"" instead'));
+      2).修改vue-style-loader的源码
+          vue-style-loader/index.js:
+          var shared = [
+            '// style-loader: Adds some css to the DOM by adding a <style> tag',
+            '',
+            '// load the styles',
+            'var content = require(' + request + ').default;', //这里加一个.default即可
+            ...
+      3).修改css-loader源码，让esModule默认为false
+          css-loader/dist/utils.js
+          function normalizeOptions(rawOptions, loaderContext) {
+            if (rawOptions.icss) {
+              loaderContext.emitWarning(new Error('The "icss" option is deprecated, use "modules.compileType: "icss"" instead'));
+            }
+            const modulesOptions = getModulesOptions(rawOptions, loaderContext);
+            return {
+              url: typeof rawOptions.url === 'undefined' ? true : rawOptions.url,
+              import: typeof rawOptions.import === 'undefined' ? true : rawOptions.import,
+              modules: modulesOptions,
+              // TODO remove in the next major release
+              icss: typeof rawOptions.icss === 'undefined' ? false : rawOptions.icss,
+              sourceMap: typeof rawOptions.sourceMap === 'boolean' ? rawOptions.sourceMap : loaderContext.sourceMap,
+              importLoaders: rawOptions.importLoaders,
+              esModule: typeof rawOptions.esModule === 'undefined' ? false : rawOptions.esModule //默认改成false
+            };
           }
-          const modulesOptions = getModulesOptions(rawOptions, loaderContext);
-          return {
-            url: typeof rawOptions.url === 'undefined' ? true : rawOptions.url,
-            import: typeof rawOptions.import === 'undefined' ? true : rawOptions.import,
-            modules: modulesOptions,
-            // TODO remove in the next major release
-            icss: typeof rawOptions.icss === 'undefined' ? false : rawOptions.icss,
-            sourceMap: typeof rawOptions.sourceMap === 'boolean' ? rawOptions.sourceMap : loaderContext.sourceMap,
-            importLoaders: rawOptions.importLoaders,
-            esModule: typeof rawOptions.esModule === 'undefined' ? false : rawOptions.esModule //默认改成false
-          };
-        }
+      
+    使用style-loader时不用改css-loader最新版本已经改为了false不会有问题了，但使用vue-style-loader还是需要改源码
     
-  使用style-loader时不用改css-loader最新版本已经改为了false不会有问题了，但使用vue-style-loader还是需要改源码
-  
