@@ -1,8 +1,6 @@
 const path=require("path")
 const HtmlWebpackPlugin=require('html-webpack-plugin')
-
-
-
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 
 module.exports={
@@ -21,6 +19,10 @@ module.exports={
     //模块加载器
     module: {
         rules: [
+            {
+                test: /\.vue$/,
+                loader: 'vue-loader'
+              },
             // 编译ES6
             {
                 test: /\.js$/,
@@ -36,7 +38,7 @@ module.exports={
             //编译css
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader'], // 多个loader从右到左处理
+                use: ['vue-style-loader', 'css-loader'], // 多个loader从右到左处理
             },
             //编译图片
             {
@@ -47,6 +49,7 @@ module.exports={
                   name: 'static/img/[name].[hash:7].[ext]' // 相对于output.path
                 }
               }
+              
         ]
       },
     // 插件
@@ -54,7 +57,8 @@ module.exports={
         new HtmlWebpackPlugin({
             template:'index.html',
             filename:'index.html'
-        })
+        }),
+        new VueLoaderPlugin()
     ],
 
     //开发服务器
@@ -67,4 +71,13 @@ module.exports={
 
     //配置开启source-map调试，可以找到错误在哪一行 好像默认已经开启
     devtool: 'cheap-module-eval-source-map',
+
+    resolve: {
+        extensions: ['.js', '.vue', '.json'], // 可以省略的后缀名
+        alias: { // 路径别名(简写方式)
+            'vue$': 'vue/dist/vue.esm.js',  // 如果是引入'vue', 加载带编译的版本
+            // '@': resolve('src'),
+            // '@components': resolve('src/components')
+        }
+    }
 }
