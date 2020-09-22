@@ -21,6 +21,7 @@ module.exports={
         rules: [
             {
                 test: /\.vue$/,
+                include: path.resolve(__dirname,"src"), // 只对src下的vue文件处理
                 loader: 'vue-loader'
               },
             // 编译ES6
@@ -38,8 +39,8 @@ module.exports={
             //编译css
             {
                 test: /\.css$/,
-                use: ['vue-style-loader', 'css-loader'], // 多个loader从右到左处理
-            },
+                use: ['vue-style-loader', 'css-loader'],
+              },
             //编译图片
             {
                 test: /\.(png|jpe?g|gif|svg)$/,
@@ -66,7 +67,7 @@ module.exports={
         open: true, // 自动打开浏览器
         port: 8080, // 指定启动服务器的端口号
         quiet:false,//不输出太多日志
-        stats: 'errors-only', // 只输出错误日志
+        //stats: 'errors-only',  只输出错误日志
     },
 
     //配置开启source-map调试，可以找到错误在哪一行 好像默认已经开启
@@ -76,8 +77,7 @@ module.exports={
         extensions: ['.js', '.vue', '.json'], // 可以省略的后缀名
         alias: { // 路径别名(简写方式)
             'vue$': 'vue/dist/vue.esm.js',  // 如果是引入'vue', 加载带编译的版本
-            // '@': resolve('src'),
-            // '@components': resolve('src/components')
+            '@':path.resolve(__dirname,"src")
         }
     }
 }
