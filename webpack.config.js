@@ -73,6 +73,7 @@ module.exports={
     //配置开启source-map调试，可以找到错误在哪一行 好像默认已经开启
     devtool: 'cheap-module-eval-source-map',
 
+    //引入模块解析
     resolve: {
         extensions: ['.js', '.vue', '.json'], // 可以省略的后缀名
         alias: { // 路径别名(简写方式)
